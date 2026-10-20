@@ -117,6 +117,22 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+## Pulling Chinese survey-vessel tracks (Global Fishing Watch)
+
+```bash
+python gfw_fetch.py              # last 12 months, every Chinese "survey"-class vessel
+python gfw_fetch.py --months 3   # or --start 2025-01-01 --end 2025-06-30
+```
+
+Uses the Global Fishing Watch API (free, non-commercial use only; token in
+`gfw_token.txt`, never uploaded). It writes one hourly track per vessel to
+`library/tracks/gfw_<MMSI>.csv`, links existing library ships and adds new ones to
+`library/vessels.csv`. Re-run it to extend the tracks; new months are merged in.
+Tracks are hourly positions on a ~1 km grid, from satellite and coastal AIS
+worldwide, so survey lines closer than ~1-2 km apart blur together. GFW's
+"survey" class also includes some coast guard and oil-industry vessels.
+Data: Powered by Global Fishing Watch (https://globalfishingwatch.org), CC BY-NC 4.0.
+
 ## Command line
 
 ```bash

@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+survey_results/
+.claude/
+gfw_token.txt
+.streamlit/secrets.toml
+.DS_Store

@@ -133,6 +133,34 @@ worldwide, so survey lines closer than ~1-2 km apart blur together. GFW's
 "survey" class also includes some coast guard and oil-industry vessels.
 Data: Powered by Global Fishing Watch (https://globalfishingwatch.org), CC BY-NC 4.0.
 
+## Models: try your own detector
+
+Each file in `models/` is one detection model. The app's sidebar has a **Model**
+dropdown to switch between them, and **Compare models** (below the map) runs
+several on the same data side by side. When it knows which vessels really are
+surveying, it also scores each model: precision (how many flagged vessels were
+real surveys) and recall (how many real surveys were found): upload a CSV with
+columns `vessel, is_survey`. `benchmarks/` holds a synthetic test set with its
+labels for quick checks from the command line (see below).
+
+- `models/baseline.py`: the original detector, unchanged. Everything is compared to it.
+- `models/example_strict.py`: the baseline with stricter rules, a minimal example.
+- `models/_template.py`: copy this to start yours. It has three options: change
+  the settings (A), write your own pattern recogniser and keep the rest of the
+  pipeline (B), or build a completely different approach (C).
+
+**Adding your model**
+
+1. Make a branch: `git checkout -b <yourname>-model`
+2. Copy `models/_template.py` to `models/<yourname>.py` and fill it in.
+3. Test it: `streamlit run app.py`, or
+   `python survey_pattern_detector.py benchmarks/synthetic_10_ships.csv --model <yourname>`
+4. Commit only your own file, push your branch and open a pull request.
+
+Everyone edits only their own file in `models/`, so merges don't conflict. A
+model that crashes on import shows a warning in the sidebar instead of breaking
+the app.
+
 ## Command line
 
 ```bash

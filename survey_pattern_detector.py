@@ -103,6 +103,8 @@ class Config:
     # --- prediction -------------------------------------------------------
     predict_lines: int = 3             # how many upcoming lines to project
     min_progression_for_prediction: float = 0.6
+    # --- model --------------------------------------------------------------
+    model: str = "baseline"            # which detector in models/ to run (file name without .py)
     # --- ports --------------------------------------------------------------
     port_country: str = "flag"         # also list ports of: "flag" = each vessel's flag state,
                                        # a country name (e.g. "China") = that country for every
@@ -1045,8 +1047,12 @@ def _prediction_row(summary, j, kind, start, end, lat0, lon0, h0, h1, last_point
 # PER-VESSEL PIPELINE
 # ============================================================
 
-def detect_surveys(vessel, v: pd.DataFrame, cfg: Config) -> dict:
-    """Clean one vessel's track, find its straight lines, survey blocks and areas, and predict."""
+def detect_surveys(vessel, v: pd.DataFrame, cfg: Config, find_blocks_fn=None) -> dict:
+    """
+    Clean one vessel's track, find its straight lines, survey blocks and areas, and predict.
+    find_blocks_fn(lines, cfg) -> (blocks, skipped) replaces find_blocks(), so a model in
+    models/ can swap in its own pattern recogniser and keep everything else.
+    """
     has_time = bool(v["time"].notna().mean() > 0.9)
     v, order_note = order_track(v, has_time)
     v = clean_track(v, cfg, has_time)
@@ -1084,7 +1090,7 @@ def detect_surveys(vessel, v: pd.DataFrame, cfg: Config) -> dict:
         l["role"] = "not in a survey block"
         l["trimmed_km"] = 0.0
 
-    blocks, skipped = find_blocks(lines, cfg)
+    blocks, skipped = (find_blocks_fn or find_blocks)(lines, cfg)
     blocks = [b for b in (trim_block_ends(b, lines, p, cfg, has_time) for b in blocks)
               if len(b) >= cfg.min_lines_per_block]
     for k in skipped:
@@ -1129,7 +1135,8 @@ def detect_surveys(vessel, v: pd.DataFrame, cfg: Config) -> dict:
 def process_vessel(args):
     """Survey detection for one vessel of one dataset, plus its identity and nearby ports."""
     dataset, vessel, v, cfg = args
-    result = detect_surveys(vessel, v, cfg)
+    import models  # here, not at the top: models/ imports this module
+    result = models.detect(cfg.model, vessel, v, cfg)
     result["dataset"] = dataset
     for key in ("lines", "blocks", "areas", "predictions"):
         result[key] = [{"dataset": dataset, **row} for row in result[key]]
@@ -1542,6 +1549,7 @@ def main():
     print("=" * 64)
     print("SURVEY PATTERN DETECTOR  v3")
     print("=" * 64)
+    print(f"Model          : {cfg.model}")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         results, notes, n_rows = run(paths, cfg, Path(args.out), args.workers, not args.no_maps)

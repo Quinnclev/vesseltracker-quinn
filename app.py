@@ -21,6 +21,7 @@ import io
 import json
 import re
 import tempfile
+import time
 import warnings
 import zipfile
 from dataclasses import asdict
@@ -35,6 +36,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from folium.plugins import FastMarkerCluster, GroupedLayerControl
 
+import models
 import port_intel
 import survey_pattern_detector as spd
 
@@ -297,6 +299,7 @@ def analyse(groups: tuple, settings: dict, identities: tuple = ()) -> dict:
     whose files carry no identity (library catalog entries, the identity form).
     """
     cfg = spd.Config(**settings)
+    started = time.perf_counter()
     with tempfile.TemporaryDirectory() as tmp:
         src, out = Path(tmp) / "input", Path(tmp) / "results"
         src.mkdir()
@@ -327,7 +330,8 @@ def analyse(groups: tuple, settings: dict, identities: tuple = ()) -> dict:
         xlsx = _excel(tables)
         zip_bytes = _zip_folder(out, extra={"survey_results.xlsx": xlsx})
     return {"notes": notes, "n_rows": n_rows, "tables": tables, "maps": maps,
-            "geojson": geojson, "zip": zip_bytes, "xlsx": xlsx}
+            "geojson": geojson, "zip": zip_bytes, "xlsx": xlsx,
+            "seconds": time.perf_counter() - started}
 
 
 def _excel(tables: dict) -> bytes:
@@ -730,6 +734,15 @@ def safe_name(text: str) -> str:
 st.set_page_config(page_title="Survey Pattern Detector", page_icon=":ship:", layout="wide")
 
 with st.sidebar:
+    st.header("Model")
+    MODELS = models.available()
+    model_key = st.selectbox("Detection model", list(MODELS), format_func=models.label, key="model",
+                             help="Each file in the models/ folder is one model. Copy "
+                                  "models/_template.py to add yours.")
+    st.caption(getattr(MODELS[model_key], "DESCRIPTION", ""))
+    for bad, why in models.errors().items():
+        st.warning(f"models/{bad}.py could not be loaded: {why}")
+
     st.header("Settings")
     st.caption("The defaults suit most survey vessels. Changes re-run the analysis.")
     defaults = asdict(spd.Config())
@@ -749,7 +762,7 @@ with st.sidebar:
                 else:
                     settings[name] = float(st.number_input(label, value=float(default), min_value=0.0,
                                                            format="%g", help=help_text, key=f"cfg_{name}"))
-    settings = {**defaults, **settings}   # anything not listed above keeps its default
+    settings = {**defaults, **settings, "model": model_key}   # anything not listed keeps its default
 
     st.header("Port matching")
     port_mode = st.radio("Also list the nearest ports of", ["Each vessel's flag state",
@@ -1168,6 +1181,59 @@ st.caption("Ports: NGA World Port Index (public domain). Sea distances follow a 
            "(searoute package) and are straight-line where no reliable route exists. Rare-earth sites "
            "are a curated list with approximate locations (reference_data/ree_sites.csv); verify "
            "before relying on them.")
+
+st.subheader("Compare models")
+st.write("Runs several models on the ships chosen above, side by side. Upload a labels file "
+         "(which vessels really are surveying) to also score each model.")
+picked = st.multiselect("Models to compare", list(MODELS), default=list(MODELS),
+                        format_func=models.label, key="compare_models")
+labels_upload = st.file_uploader("Labels (optional): CSV with columns vessel, is_survey (1 or 0)",
+                                 type=["csv"], key="labels_upload")
+if st.button("Run comparison", disabled=not picked):
+    labels = None
+    if labels_upload is not None:
+        labels = pd.read_csv(labels_upload, dtype={"vessel": str})
+        labels = dict(zip(labels["vessel"].astype(str), labels["is_survey"].astype(int)))
+
+    summary, per_vessel = [], {}
+    ident = tuple(lib_ids) + tuple(sorted((k[0], k[1], v["mmsi"], v["flag"], v["name"], "entered", "")
+                                          for k, v in given.items()))
+    for key in picked:
+        with st.spinner(f"Running {models.label(key)}..."):
+            r = analyse(tuple(groups), {**settings, "model": key}, ident)
+        V, B = r["tables"]["vessels"], r["tables"]["survey_blocks"]
+        found = dict(zip(V["vessel"].astype(str), V["survey_status"] != "No survey pattern"))
+        per_vessel[models.label(key)] = found
+        row = {"model": models.label(key),
+               "vessels flagged": sum(found.values()),
+               "survey areas": len(r["tables"]["survey_areas"]),
+               "survey blocks": len(B),
+               "mean block score": round(float(B["score"].mean()), 3) if len(B) else None,
+               "predictions": len(r["tables"]["predictions"]),
+               "seconds": round(r["seconds"], 2)}
+        if labels:
+            truth = {v: labels[v] for v in found if v in labels}
+            tp = sum(found[v] and t for v, t in truth.items())
+            fp = sum(found[v] and not t for v, t in truth.items())
+            fn = sum(not found[v] and t for v, t in truth.items())
+            row.update({"true positives": tp, "false alarms": fp, "missed": fn,
+                        "precision": round(tp / (tp + fp), 2) if tp + fp else None,
+                        "recall": round(tp / (tp + fn), 2) if tp + fn else None})
+        summary.append(row)
+    st.session_state["comparison"] = (summary, per_vessel, labels)
+
+if "comparison" in st.session_state:
+    summary, per_vessel, labels = st.session_state["comparison"]
+    st.dataframe(pd.DataFrame(summary), hide_index=True, width="stretch")
+    st.caption("precision = share of flagged vessels that really are surveying; recall = share of "
+               "real surveys that were flagged. seconds is the first, uncached run.")
+    grid = pd.DataFrame(per_vessel).replace({True: "survey", False: ""})
+    if labels:
+        grid.insert(0, "truth", [("survey" if labels.get(v) else "") if v in labels else "?"
+                                 for v in grid.index])
+    grid.index.name = "vessel"
+    st.markdown("**Per vessel**")
+    st.dataframe(grid.reset_index(), hide_index=True, width="stretch")
 
 st.subheader("All results")
 tabs = st.tabs(["Vessels", "Nearby ports", "Survey areas", "Survey blocks", "Survey lines",

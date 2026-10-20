@@ -1160,6 +1160,10 @@ else:
         with st.expander("Detector map (PNG)"):
             st.image(png, width="stretch")
 
+st.markdown("<div style='font-size:0.8rem;opacity:0.75'>Library tracks for Chinese survey vessels: "
+            "<a href='https://globalfishingwatch.org' target='_blank'>Powered by Global Fishing Watch</a> "
+            "(CC BY-NC 4.0; hourly positions on a ~1 km grid). US reference tracks: NOAA Marine Cadastre "
+            "(public domain).</div>", unsafe_allow_html=True)
 st.caption("Ports: NGA World Port Index (public domain). Sea distances follow a shipping-lane network "
            "(searoute package) and are straight-line where no reliable route exists. Rare-earth sites "
            "are a curated list with approximate locations (reference_data/ree_sites.csv); verify "

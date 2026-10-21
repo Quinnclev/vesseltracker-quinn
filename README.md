@@ -212,19 +212,21 @@ The regions are rough boxes for indication only; edit the CSV to refine them.
 Sources: ISA exploration areas; Hein et al. 2013, Ore Geology Reviews 51;
 Kato et al. 2011, Nature Geoscience (REE mud); national seabed-mining reviews.
 
-## Your own copy on GitHub (fork) and merging
+## Your own copy on GitHub, and merging later
 
-1. Sign in to GitHub, open the team repository and click **Fork**: a copy under
-   your account that stays linked to the team's, so changes can flow both ways.
-2. Point this folder at your fork and push your branch:
-   `git remote add mine https://github.com/<you>/vesseltracker2.git` then
-   `git push mine quinn-models`.
-3. On your fork, merge the branch into its `main` (or deploy the branch itself),
-   then at <https://share.streamlit.io> **Create app** from your fork, main file
-   `app.py`. You get your own link with every model in the dropdown.
-4. To bring the team's newer work in: on your fork click **Sync fork**, or
-   `git fetch origin && git merge origin/main`. To give your work to the team:
-   **Contribute -> Open pull request** from your fork to the team repository.
+A separate repository under your own account changes nothing in the team's:
+
+1. On GitHub: **New repository**, e.g. `vesseltracker-quinn`, with no README
+   (it must start empty).
+2. Push this folder's branch to it as its `main`:
+   `git remote add mine https://github.com/<you>/vesseltracker-quinn.git` then
+   `git push mine quinn-models:main`.
+3. At <https://share.streamlit.io> **Create app** from that repository, main file
+   `app.py`: your own link, with every model in the dropdown.
+4. Later, to merge: the branch already contains the team's history, so it can
+   be merged into the team repository (or opened as a pull request) whenever
+   the team agrees. To pick up the team's newer work meanwhile:
+   `git fetch origin && git merge origin/main`.
 
 Uploading files through the GitHub website works too, but it replaces whole
 files; git merges line by line, so two people's edits to `app.py` combine.

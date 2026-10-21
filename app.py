@@ -38,6 +38,7 @@ from folium.plugins import FastMarkerCluster, GroupedLayerControl
 
 import models
 import port_intel
+import resource_context
 import survey_pattern_detector as spd
 
 HERE = Path(__file__).resolve().parent
@@ -618,6 +619,25 @@ def build_map(geojson: dict, vessels: pd.DataFrame, focus: tuple | None) -> foli
                                                          ("Note", p["note"]), ("Outline", p["source"])]),
                                                   max_width=360)).add_to(national)
 
+    resources = {cat: folium.FeatureGroup(f"Likely target: {cat.lower()}", show=False)
+                 for cat in resource_context.CATEGORY_ORDER}
+    for _, r in resource_context.regions().iterrows():
+        col = resource_context.CATEGORY_COLORS.get(r["category"], "#555")
+        # edges every few degrees, so a box spanning the 180° line or the whole globe stays whole
+        lo0, lo1 = ((c - 180, c + 180) if r["max_lon"] - r["min_lon"] >= 359     # whole-globe band
+                    else (r["min_lon"], r["max_lon"]))
+        lons = np.linspace(lo0, lo1, max(2, int((lo1 - lo0) // 10) + 2))
+        ring = ([[lo, r["min_lat"]] for lo in lons] + [[lo, r["max_lat"]] for lo in lons[::-1]])
+        folium.Polygon(_unwrap(ring, c), color=col, weight=1.5, fill=True,
+                       fill_opacity=0.08, tooltip=f"{r['name']}: {r['category']}",
+                       popup=folium.Popup(_rows([("Region", f"<b>{html.escape(r['name'])}</b>"),
+                                                 ("Resource", r["category"]), ("Commodities", r["commodities"]),
+                                                 ("Depth", r["depth"]), ("Note", r["notes"]),
+                                                 ("Source", r["source"]),
+                                                 ("Outline", "approximate box, for indication only")]),
+                                          max_width=360)).add_to(resources.setdefault(
+            r["category"], folium.FeatureGroup(f"Likely target: {r['category'].lower()}", show=False)))
+
     world_ports = folium.FeatureGroup("All world ports (3,800)", show=False)
     ports = port_intel.load_ports()
     if len(ports):
@@ -630,6 +650,7 @@ def build_map(geojson: dict, vessels: pd.DataFrame, focus: tuple | None) -> foli
                                     flag_routes, plain_routes]
     groups["Seabed mining areas"] = list(seabed.values()) + [national]
     groups["Rare-earth sites"] = list(site_groups.values())
+    groups["What surveys here look for (approx.)"] = list(resources.values())
     groups["Reference"] = [world_ports]
     for members in groups.values():
         for g in members:
@@ -1116,6 +1137,11 @@ else:
                     f"Lines run {a['line_axis_compass']}, ~{a['median_spacing_km']} km apart; "
                     f"{a['total_line_km']} line-km over ~{a['area_km2']} km², centred at "
                     f"{a['centroid_lat']}, {a['centroid_lon']}.")
+        if not _blank(a.get("likely_target")):
+            alt = "" if _blank(a.get("target_alternatives")) else f" Also possible: {a['target_alternatives']}."
+            what = "" if _blank(a.get("target_commodities")) else f" ({a['target_commodities']})"
+            st.markdown(f"**Likely surveying for:** {a['likely_target']}{what}. "
+                        f"_Basis: {a['target_basis']}._{alt}")
         near = (ports_tbl[(ports_tbl["dataset"] == ds) & (ports_tbl["vessel"] == vs)
                           & (ports_tbl["area_id"] == a["area_id"])] if len(ports_tbl) else ports_tbl)
         if len(near):

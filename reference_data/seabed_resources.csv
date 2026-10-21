@@ -1,0 +1,43 @@
+name,category,commodities,min_lon,min_lat,max_lon,max_lat,depth,notes,source
+Clarion-Clipperton Zone,Polymetallic nodules,"Ni, Co, Cu, Mn (trace REE)",-160,0,-115,23,4000-6000 m,"Largest known nodule field; most ISA nodule contracts, including China Minmetals and COMRA.",ISA exploration areas; Hein et al. 2013 (Ore Geology Reviews 51)
+Peru Basin,Polymetallic nodules,"Ni, Co, Cu, Mn",-92,-12,-80,-4,4000-4300 m,"DISCOL disturbance experiment site; no ISA contract.",Hein et al. 2013
+Cook Islands / Penrhyn Basin,Polymetallic nodules,"Co, Ni, Mn (cobalt-rich nodules)",-166,-18,-154,-8,4500-5500 m,"National (EEZ) exploration licences, not ISA.",Hein et al. 2013; Cook Islands Seabed Minerals Authority
+Central Indian Ocean Basin,Polymetallic nodules,"Ni, Co, Cu, Mn",72,-18,82,-8,5000-5500 m,India's ISA nodule contract.,ISA exploration areas
+Western Pacific nodules (Minamitorishima / Marcus-Wake),Polymetallic nodules,"Co, Ni, Mn",150,15,160,26,5500-6000 m,"Japanese EEZ nodules; COMRA western Pacific area nearby.",Hein et al. 2013
+Prime Crust Zone (west),Cobalt-rich crusts,"Co, Ni, Te, Pt, REE",140,0,180,30,800-2500 m (seamount flanks),"Seamounts of the Magellan, Marcus-Wake and Marshall chains; Chinese, Japanese, Korean and Russian ISA crust contracts.",USGS (Hein); ISA exploration areas
+Prime Crust Zone (east of 180),Cobalt-rich crusts,"Co, Ni, Te, Pt, REE",-180,0,-165,25,800-2500 m (seamount flanks),Mid-Pacific Mountains and Line Islands seamounts.,USGS (Hein)
+Rio Grande Rise,Cobalt-rich crusts,"Co, Ni, REE",-38,-34,-28,-28,800-2000 m,Brazil's ISA crust contract.,ISA exploration areas
+NE Atlantic seamounts (Tropic Seamount),Cobalt-rich crusts,"Co, Te, REE",-22,20,-14,30,1000-3000 m,Canary Islands seamount province.,Hein et al. 2013
+Afanasy-Nikitin Seamount,Cobalt-rich crusts,"Co, Ni",82,-5,84,-1,1200-3000 m,India's crust application.,ISA
+Mid-Atlantic Ridge (north),Seafloor massive sulphides,"Cu, Zn, Au, Ag",-50,10,-35,35,2000-4000 m,"Russian, French and Polish ISA sulphide contracts.",ISA exploration areas
+Southwest Indian Ridge,Seafloor massive sulphides,"Cu, Zn, Au, Ag",45,-40,65,-26,1500-3500 m,China (COMRA) ISA sulphide contract.,ISA exploration areas
+Central Indian Ridge,Seafloor massive sulphides,"Cu, Zn, Au, Ag",63,-26,72,-8,2000-4000 m,India and Germany ISA sulphide contracts.,ISA exploration areas
+Carlsberg Ridge,Seafloor massive sulphides,"Cu, Zn, Au, Ag",57,0,68,10,2000-4000 m,India's sulphide contract (reported 2025).,Ministry of Earth Sciences (India)
+Okinawa Trough,Seafloor massive sulphides,"Cu, Zn, Pb, Au, Ag",122,24,130,31,700-2000 m,Back-arc hydrothermal fields; Japanese and Chinese research. Overlaps East China Sea oil and gas.,Hein et al. 2013
+Manus Basin (Solwara),Seafloor massive sulphides,"Cu, Au, Zn",150,-5,153,-3,1500-2000 m,Papua New Guinea national licence (Solwara 1).,Hein et al. 2013
+Mariana Trough,Seafloor massive sulphides,"Cu, Zn, Au",142,12,146,22,3000-4000 m,Back-arc hydrothermal fields.,Hein et al. 2013
+Lau Basin / Tonga-Kermadec arc,Seafloor massive sulphides,"Cu, Zn, Au",-180,-35,-172,-15,1000-2500 m,National exploration licences (Tonga).,Hein et al. 2013
+East Pacific Rise,Seafloor massive sulphides,"Cu, Zn",-115,-20,-100,15,2500-3000 m,Mid-ocean ridge hydrothermal vents; mostly scientific.,Hein et al. 2013
+Minamitorishima REE mud,Rare-earth-rich mud,"REE, Y",150,20,158,28,5500-6000 m,Japanese EEZ deep-sea mud with high rare-earth content; the main deep-sea rare-earth prospect.,Kato et al. 2011 (Nature Geoscience)
+South-east Pacific REE mud,Rare-earth-rich mud,"REE, Y",-150,-20,-110,-5,4000-5000 m,Broad area of REE-enriched pelagic clay; low confidence.,Kato et al. 2011
+Chatham Rise,Phosphorite,P (phosphate),174,-45,180,-43,250-450 m,New Zealand; mining consent applied for and refused.,Chatham Rock Phosphate; CER seabed-mining review
+Namibian shelf phosphate,Phosphorite,P (phosphate),12,-26,15,-18,180-300 m,"Namibian Marine Phosphate licence, contested.",SAIIA briefing on Namibian seabed mining
+Baja California shelf (Don Diego),Phosphorite,P (phosphate),-116,24,-110,31,60-90 m,Mexican national proposal.,CER seabed-mining review
+Namibia / South Africa diamonds,Marine placers,Diamonds,14,-32,17,-26,0-150 m,Active offshore diamond mining.,SAIIA; CER seabed-mining review
+Bangka-Belitung tin,Marine placers,Sn (tin),105,-4,109,-1,0-50 m,Active offshore tin dredging (Indonesia).,CER seabed-mining review
+Taranaki iron sands,Marine placers,"Fe, Ti, V",172,-40.5,175,-38.5,20-50 m,New Zealand iron-sand proposal.,CER seabed-mining review
+Gulf of Mexico,Oil and gas,"Oil, gas",-98,18,-82,30,0-3000 m,Major offshore basin.,general
+North Sea,Oil and gas,"Oil, gas; offshore wind",-4,51,9,62,0-200 m,"Major offshore basin; also wind farms and cable routes.",general
+Barents Sea,Oil and gas,"Oil, gas",15,68,60,77,100-500 m,Norwegian and Russian Arctic shelf.,general
+South China Sea,Oil and gas,"Oil, gas; gas hydrates",105,5,121,23,0-4000 m,"Pearl River Mouth, Qiongdongnan, Spratly basins; also territorial patrols.",general
+East China Sea shelf,Oil and gas,"Oil, gas",120,25,128,33,0-200 m,Xihu depression; disputed waters.,general
+Bohai / Yellow Sea,Oil and gas,"Oil, gas",117,34,126,41,0-80 m,Chinese offshore oil fields.,general
+Brazil pre-salt (Santos / Campos),Oil and gas,"Oil, gas",-48,-28,-38,-20,1500-3000 m,Deep-water oil province.,general
+Gulf of Guinea / Angola,Oil and gas,"Oil, gas",-2,-12,14,6,0-3000 m,Niger Delta and Angolan deep water.,general
+Persian Gulf,Oil and gas,"Oil, gas",47,23,57,30,0-100 m,Shallow shelf fields.,general
+North West Shelf (Australia),Oil and gas,"Gas, oil",112,-22,125,-12,0-1500 m,LNG gas fields.,general
+Beaufort / Chukchi shelf,Oil and gas,"Oil, gas",-170,68,-135,72.5,0-200 m,Alaskan Arctic shelf.,general
+Shenhu gas hydrates,Gas hydrates,Methane hydrate,113,19,116,21,1000-1500 m,China's hydrate production trials.,general
+Nankai Trough hydrates,Gas hydrates,Methane hydrate,135,32,139,34,700-1500 m,Japan's hydrate production trials.,general
+Central Arctic Ocean,Scientific / sovereignty mapping,"Extended continental shelf claims, ice and climate research",-180,72.5,180,90,500-4000 m,"Lawnmower surveys here usually map the seabed for UNCLOS Article 76 shelf claims or science, not mining; Chukchi Borderland is a frequent Chinese research target.",UNCLOS Article 76; general
+Southern Ocean,Scientific / sovereignty mapping,"Science; Antarctic Treaty bans mining",-180,-90,180,-60,0-5000 m,Mineral resource activity is prohibited south of 60 S (Madrid Protocol).,Antarctic Treaty (Madrid Protocol)

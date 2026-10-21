@@ -1047,11 +1047,14 @@ def _prediction_row(summary, j, kind, start, end, lat0, lon0, h0, h1, last_point
 # PER-VESSEL PIPELINE
 # ============================================================
 
-def detect_surveys(vessel, v: pd.DataFrame, cfg: Config, find_blocks_fn=None) -> dict:
+def detect_surveys(vessel, v: pd.DataFrame, cfg: Config, find_blocks_fn=None,
+                   find_lines_fn=None) -> dict:
     """
     Clean one vessel's track, find its straight lines, survey blocks and areas, and predict.
-    find_blocks_fn(lines, cfg) -> (blocks, skipped) replaces find_blocks(), so a model in
-    models/ can swap in its own pattern recogniser and keep everything else.
+    A model in models/ can swap in its own steps and keep everything else:
+      find_lines_fn(chunk, cfg) -> [(start, end), ...] point positions within the chunk
+                                   DataFrame, replacing the straight-line finder
+      find_blocks_fn(lines, cfg) -> (blocks, skipped), replacing find_blocks()
     """
     has_time = bool(v["time"].notna().mean() > 0.9)
     v, order_note = order_track(v, has_time)
@@ -1077,7 +1080,9 @@ def detect_surveys(vessel, v: pd.DataFrame, cfg: Config, find_blocks_fn=None) ->
     lines = []
     for _, g in p.groupby("chunk", sort=True):
         offset = g.index[0]
-        for a, b in lines_in_chunk(g["lat"].to_numpy(), g["lon"].to_numpy(), cfg):
+        pairs = (find_lines_fn(g, cfg) if find_lines_fn
+                 else lines_in_chunk(g["lat"].to_numpy(), g["lon"].to_numpy(), cfg))
+        for a, b in pairs:
             info = describe_line(p, a + offset, b + offset, has_time)
             if info["length_km"] >= cfg.min_line_km and info["n_points"] >= cfg.min_points_per_line:
                 info["chunk"] = int(g["chunk"].iloc[0])
@@ -1142,6 +1147,10 @@ def process_vessel(args):
         result[key] = [{"dataset": dataset, **row} for row in result[key]]
     result["info"] = info = vessel_info(result)
     info["port_country"], info["port_country_basis"] = port_match_country(info, cfg)
+    import resource_context
+    for area in result["areas"]:   # what the survey is likely looking for, from where it is
+        area.update(resource_context.describe(area["centroid_lat"], area["centroid_lon"],
+                                              info["name"], info["ship_type"]))
     result["nearby_ports"] = survey_ports(result, info["port_country"])
     return result
 

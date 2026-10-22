@@ -656,6 +656,14 @@ def build_map(geojson: dict, vessels: pd.DataFrame, focus: tuple | None) -> foli
         for g in members:
             g.add_to(m)
     GroupedLayerControl(groups, exclusive_groups=False, collapsed=True).add_to(m)   # opens on hover / tap
+    # the layer list is taller than the map: give it its own scroll bar, and keep the
+    # mouse wheel / touch drag inside it from zooming or panning the map
+    m.get_root().header.add_child(folium.Element(
+        "<style>.leaflet-control-layers-expanded{max-height:min(520px,calc(100vh - 120px));"
+        "overflow-y:auto;overscroll-behavior:contain;}</style>"))
+    m.get_root().script.add_child(folium.Element(
+        "setTimeout(function () { document.querySelectorAll('.leaflet-control-layers').forEach("
+        "function (el) { L.DomEvent.disableScrollPropagation(el); L.DomEvent.disableClickPropagation(el); }); }, 0);"))
     LiveSeabedAreas(c, seabed).add_to(m)
     folium.LayerControl(position="bottomleft", collapsed=True).add_to(m)   # basemaps
 
